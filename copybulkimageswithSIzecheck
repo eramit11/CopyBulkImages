@@ -1,0 +1,48 @@
+<?php
+/**
+ * @Function : Copy all images from diffrent dir.
+ * @Auther : Er Amit Anand
+ * @Date   : 18-01-2021
+ */
+$directory = 'old images folder patj';
+$newPath = 'New image folder path';
+
+$images = preg_grep('/\.(jpg|jpeg|png|gif)(?:[\?\#].*)?$/i', $files);
+
+if ($handle = opendir($directory)) {
+    while (false !== ($entry = readdir($handle))) {
+        $files[] = $entry;
+    }
+    $images = preg_grep('/\.jpg$/i', $files);
+
+    $dataArr = [];
+
+    foreach ($images as $image) {
+        $findSKU = explode('_', $image);
+        $fullImagePath = $directory.'/'.$image;
+        $newFinalPath = $newPath.$image;
+
+        $imgsize = filesize($fullImagePath);
+
+        $imgList = $image.',';
+        $data = [$imgList];
+
+        if ($imgsize == '220') {
+            $dataArr[][] = $image;
+
+            $list = [$image];
+            echo 'ready for copy';
+            copy($fullImagePath, $newFinalPath);
+        }
+    }
+
+    $file = fopen('<csv file path>.csv', 'w');
+
+    foreach ($dataArr as $line) {
+        fputcsv($file, $line);
+    }
+
+    fclose($file);
+
+    closedir($handle);
+}
