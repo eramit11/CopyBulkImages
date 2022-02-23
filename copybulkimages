@@ -1,0 +1,66 @@
+<?php
+
+/**
+ * @Function : Copy Bulk all images from diffrent dir.
+ * @Auther : Er Amit Anand
+ * @Date   : 23-02-2021
+ */
+$dir = 'OLD Images folder Path ';
+
+
+/**
+ * @Function : Copy images 
+ * @Auther : Er Amit Anand
+ * @Date   : 23-02-2021
+ * @Desc   : copy all image from old path to new path via termianl
+ */
+function ListFiles($dir)
+{
+    if ($dh = opendir($dir)) {
+        $files = [];
+        $inner_files = [];
+        while ($file = readdir($dh)) {
+            if ($file != '.' && $file != '..' && $file[0] != '.') {
+                if (is_dir($dir.'/'.$file)) {
+                    $inner_files = ListFiles($dir.'/'.$file);
+                    if (is_array($inner_files)) {
+                        $files = array_merge($files, $inner_files);
+                    }
+                } else {
+                    array_push($files, $dir.'/'.$file);
+                }
+            }
+        }
+        closedir($dh);
+
+        return $files;
+    }
+}
+$newPath = 'NEW image folder path';
+
+foreach (ListFiles($dir) as $key => $file) {
+    $exFile = explode('/', $file);
+
+    $newName = $newPath.$exFile[5];
+    $copied = copy($file, $newName);
+
+    $findSKU = explode('_', $exFile[5]);
+
+    $list = [
+        [$exFile[4], $exFile[5]],
+      ];
+
+    if ((!$copied)) {
+        echo 'Error : Not Copied';
+    } else {
+        echo 'Copied Successful===============';
+    }
+}
+
+$file = fopen('<csv file path>.csv', 'w');
+
+foreach ($list as $line) {
+    fputcsv($file, $line);
+}
+
+fclose($file);
